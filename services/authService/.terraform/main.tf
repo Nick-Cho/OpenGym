@@ -57,6 +57,7 @@ resource "aws_cognito_user_pool_client" "userpool_client" {
     refresh_token = "hours"
   }
 }
+
 # Configure aws_cognito_resource_server in the future to authenticate the API's from other services
 
 
