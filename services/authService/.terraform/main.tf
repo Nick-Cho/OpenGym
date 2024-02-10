@@ -57,6 +57,8 @@ resource "aws_cognito_user_pool_client" "userpool_client" {
     refresh_token = "hours"
   }
 }
+# Configure aws_cognito_resource_server in the future to authenticate the API's from other services
+
 
 # resource "aws_api_gateway_rest_api" "auth_api" {
 #     name = "opengym-auth-api"
