@@ -6,7 +6,7 @@ import (
 
 	"log"
 
-	config "github.com/Nick-Cho/OpenGym/internal/config"
+	config "gymService/internal/config"
 
 	"github.com/aws/aws-lambda-go/events"
 )
