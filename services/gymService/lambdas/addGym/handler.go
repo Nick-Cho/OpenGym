@@ -7,6 +7,7 @@ import (
 	"log"
 
 	config "gymService/internal/config"
+	response "gymService/internal/responses"
 
 	"github.com/aws/aws-lambda-go/events"
 )
@@ -17,15 +18,7 @@ func (h *Handler) HandleRequest(request events.APIGatewayProxyRequest) (events.A
 	var requestBody map[string]string
 	if request.Body == "" {
 		log.Println("No request body provided")
-		response := events.APIGatewayProxyResponse{
-			StatusCode: 400,
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin":      "*",
-				"Access-Control-Allow-Headers":     "*",
-				"Access-Control-Allow-Credentials": "true",
-			},
-			Body: string("No request body provided"),
-		}
+		response := response.CreateMsgResp(400, "No request body provided")
 		return response, nil
 	}
 	db := config.Connect()
@@ -47,15 +40,7 @@ func (h *Handler) HandleRequest(request events.APIGatewayProxyRequest) (events.A
 	if err != nil {
 		log.Printf("Error %s when inserting into gym table \n", err)
 
-		response := events.APIGatewayProxyResponse{
-			StatusCode: 400,
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin":      "*",
-				"Access-Control-Allow-Headers":     "*",
-				"Access-Control-Allow-Credentials": "true",
-			},
-			Body: fmt.Sprintf("Error inserting new entry into user table: %s", err),
-		}
+		response := response.CreateMsgResp(400, fmt.Sprintf("Error inserting new entry into gym table: %s", err))
 		return response, nil
 	}
 
@@ -63,27 +48,10 @@ func (h *Handler) HandleRequest(request events.APIGatewayProxyRequest) (events.A
 	if err != nil {
 		log.Printf("Error %s when getting last inserted id \n", err)
 
-		response := events.APIGatewayProxyResponse{
-			StatusCode: 400,
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin":      "*",
-				"Access-Control-Allow-Headers":     "*",
-				"Access-Control-Allow-Credentials": "true",
-			},
-			Body: fmt.Sprintf("Error getting last inserted id: %s", err),
-		}
+		response := response.CreateMsgResp(400, fmt.Sprintf("Error getting last inserted id: %s", err))
 		return response, nil
 	}
 	fmt.Printf("Last inserted id: %d", id)
-	response := events.APIGatewayProxyResponse{
-		StatusCode: 202,
-		Headers: map[string]string{
-			"Access-Control-Allow-Origin":      "*",
-			"Access-Control-Allow-Headers":     "*",
-			"Access-Control-Allow-Credentials": "true",
-		},
-		Body: fmt.Sprintf("%d", id),
-	}
-
+	response := response.CreateMsgResp(202, fmt.Sprintf("%d", id))
 	return response, nil
 }

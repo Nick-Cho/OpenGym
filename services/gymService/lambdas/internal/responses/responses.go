@@ -4,7 +4,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 )
 
-func CreateMessageResponse(statusCode int, resMsg string) events.APIGatewayProxyResponse {
+func CreateMsgResp(statusCode int, resMsg string) events.APIGatewayProxyResponse {
 	// StatusOk = 200
 	// StatusCreated = 201
 	// StatusAccepted = 202
