@@ -19,6 +19,8 @@ type GymInfo struct {
 	GymType      int    `json:"gym_type"`
 	IsCommercial bool   `json:"is_commercial"`
 	Fee          int    `json:"fee"`
+	Lat          string `json:"lat"`
+	Lng          string `json:"lng"`
 }
 
 func (h *Handler) HandleRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -33,7 +35,7 @@ func (h *Handler) HandleRequest(request events.APIGatewayProxyRequest) (events.A
 	var gymInfo GymInfo
 	res.Next()
 
-	err = res.Scan(&gymInfo.OwnerId, &gymInfo.GymType, &gymInfo.IsCommercial, &gymInfo.Fee)
+	err = res.Scan(&gymInfo.OwnerId, &gymInfo.GymType, &gymInfo.IsCommercial, &gymInfo.Fee, &gymInfo.Lat, &gymInfo.Lng, &gymInfo.Name)
 	if err != nil {
 		log.Println("Error scanning gym info: ", err)
 		return resp.CreateMsgResp(400, fmt.Sprintf("Error getting last inserted id: %s", err)), nil

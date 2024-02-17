@@ -32,6 +32,10 @@ func (h *Handler) HandleRequest(request events.APIGatewayProxyRequest) (events.A
 	gym_type := requestBody["gym_type"]
 	is_commericial := requestBody["is_commericial"]
 	fee := requestBody["fee"]
+	lat := requestBody["lat"]
+	lng := requestBody["lng"]
+
+	fmt.Printf("lat: %s, lng: %s", lat, lng)
 
 	fmt.Printf("name: %s, address: %s, owner_id: %s, gym_type: %s, is_commericial: %s, fee: %s", name, address, owner_id, gym_type, is_commericial, fee)
 	sqlRequest := fmt.Sprintf("INSERT INTO Gym (name, address, owner_id, gym_type, is_commericial, fee) VALUES ('%s', '%s', '%s', '%s', '%s', '%s')", name, address, owner_id, gym_type, is_commericial, fee)
