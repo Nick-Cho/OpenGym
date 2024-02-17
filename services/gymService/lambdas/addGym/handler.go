@@ -34,13 +34,12 @@ func (h *Handler) HandleRequest(request events.APIGatewayProxyRequest) (events.A
 	fee := requestBody["fee"]
 
 	fmt.Printf("name: %s, address: %s, owner_id: %s, gym_type: %s, is_commericial: %s, fee: %s", name, address, owner_id, gym_type, is_commericial, fee)
-	sqlRequest := fmt.Sprintf("INSERT INTO gym (name, address, owner_id, gym_type, is_commericial, fee) VALUES ('%s', '%s', '%s', '%s', '%s', '%s')", name, address, owner_id, gym_type, is_commericial, fee)
+	sqlRequest := fmt.Sprintf("INSERT INTO Gym (name, address, owner_id, gym_type, is_commericial, fee) VALUES ('%s', '%s', '%s', '%s', '%s', '%s')", name, address, owner_id, gym_type, is_commericial, fee)
 	fmt.Printf("sql post request from addGym: %s", sqlRequest)
 	res, err := db.Exec(sqlRequest)
 	if err != nil {
-		log.Printf("Error %s when inserting into gym table \n", err)
-
-		response := response.CreateMsgResp(400, fmt.Sprintf("Error inserting new entry into gym table: %s", err))
+		log.Printf("Error %s when inserting into Gym table \n", err)
+		response := response.CreateMsgResp(400, fmt.Sprintf("Error inserting new entry into Gym table: %s", err))
 		return response, nil
 	}
 
