@@ -20,7 +20,7 @@ func (h *Handler) HandleRequest(request events.APIGatewayProxyRequest) (events.A
 		return resp.CreateMsgResp(400, "No gym id provided"), nil
 	}
 	sqlRequest := fmt.Sprintf("DELETE FROM Gym WHERE id = %s", gym_id)
-	res, err := db.Exec(sqlRequest)
+	_, err := db.Exec(sqlRequest)
 	if err != nil {
 		log.Printf("Error deleting from Gym table: %s", err)
 		response := resp.CreateMsgResp(400, fmt.Sprintf("Error deleting from Gym table: %s", err))
