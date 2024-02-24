@@ -124,15 +124,15 @@ resource "aws_api_gateway_method" "add_gym" {
   http_method         = "POST"
   authorization       = "NONE"
 
-  request_parameters = {
-    "method.request.body.name" = true
-    "method.request.body.address" = true
-    "method.request.body.owner_id" = true
-    "method.request.body.is_commercial" = true
-    "method.request.body.fee" = true
-    "method.request.body.lat" = true
-    "method.request.body.lng" = true
-  }
+  # request_parameters = {
+  #   "method.request.body.name" = true
+  #   "method.request.body.address" = true
+  #   "method.request.body.owner_id" = true
+  #   "method.request.body.is_commercial" = true
+  #   "method.request.body.fee" = true
+  #   "method.request.body.lat" = true
+  #   "method.request.body.lng" = true
+  # }
 }
 
 resource "aws_api_gateway_method" "update_gym" {
@@ -141,9 +141,9 @@ resource "aws_api_gateway_method" "update_gym" {
   http_method         = "PUT"
   authorization       = "NONE"
 
-  request_parameters = {
-    "method.request.body.gym_id" = true
-  }
+  # request_parameters = {
+  #   "method.request.body.gym_id" = true
+  # }
 }
 
 resource "aws_api_gateway_method" "delete_gym" {
