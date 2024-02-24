@@ -50,12 +50,6 @@ resource "aws_s3_bucket_cors_configuration" "gym_images_config" {
     }
 } 
 
-# resource "aws_s3_bucket_logging" "gym_images_logging" {
-#     bucket = aws_s3_bucket.gym_images_bucket.id
-#     target_bucket = "gym-images-logs"
-#     target_prefix = "gym-images-logs/"
-# }
-
 resource "aws_s3_bucket_server_side_encryption_configuration" "gym_images_encryption" {
   bucket = aws_s3_bucket.gym_images_bucket.id
 
@@ -83,6 +77,25 @@ resource "aws_db_instance" "gym_db" {
   skip_final_snapshot = true
   enabled_cloudwatch_logs_exports = ["general", "slowquery", "audit"]
 }
+
+# resource "aws_db_instance" "gym_db_read_replica" {
+#   count = 1
+#   allocated_storage    = 20
+#   backup_retention_period = 1
+#   backup_target = "region"
+#   db_name              = "gym_db_master"  
+#   storage_type         = "gp2"
+#   engine               = "mysql"
+#   engine_version       = "5.7"
+#   instance_class       = "db.t2.micro"
+#   username             = "gym_admin"
+#   password             = "gym_admin"
+#   db_subnet_group_name = aws_db_subnet_group.gym_db_subnet_group.name
+#   vpc_security_group_ids = [aws_security_group.gym_db_security_group.id]
+#   parameter_group_name = "default.mysql5.7"
+#   skip_final_snapshot = true
+#   enabled_cloudwatch_logs_exports = ["general", "slowquery", "audit"]
+# }
 
 resource "aws_api_gateway_rest_api" "gym_apigw" {
   name                = "Gym_Service_ApiGW"
@@ -278,41 +291,41 @@ resource "aws_iam_role" "role" {
 }
 
 resource "aws_lambda_function" "get_gym_lambda" {
-  filename        = "./lambdas/getGymDetails/main.zip"
+  filename        = "../lambdas/getGymDetails/main.zip"
   function_name   = "get_gym"
   role            = aws_iam_role.role.arn
   handler         = "main.main"
   runtime         = "provided.al2023"
 
-  source_code_hash = filebase64sha256("main.zip")
+  source_code_hash = filebase64sha256("../lambdas/getGymDetails/main.zip")
 }
 
 resource "aws_lambda_function" "add_gym_lambda" {
-  filename        = "./lambdas/addGym/main.zip"
+  filename        = "../lambdas/addGym/main.zip"
   function_name   = "add_gym"
   role            = aws_iam_role.role.arn
   handler         = "main.main"
   runtime         = "provided.al2023"
 
-  source_code_hash = filebase64sha256("main.zip")
+  source_code_hash = filebase64sha256("../lambdas/addGym/main.zip")
 }
 
 resource "aws_lambda_function" "delete_gym_lambda" {
-  filename        = "./lambdas/deleteGym/main.zip"
+  filename        = "../lambdas/deleteGym/main.zip"
   function_name   = "delete_gym"
   role            = aws_iam_role.role.arn
   handler         = "main.main"
   runtime         = "provided.al2023"
 
-  source_code_hash = filebase64sha256("main.zip")
+  source_code_hash = filebase64sha256("../lambdas/deleteGym/main.zip")
 }
 
 resource "aws_lambda_function" "update_gym_lambda" {
-  filename        = "./lambdas/updateGym/main.zip"
+  filename        = "../lambdas/updateGym/main.zip"
   function_name   = "update_gym"
   role            = aws_iam_role.role.arn
   handler         = "main.main"
   runtime         = "provided.al2023"
 
-  source_code_hash = filebase64sha256("main.zip")
+  source_code_hash = filebase64sha256("../lambdas/updateGym/main.zip")
 }
