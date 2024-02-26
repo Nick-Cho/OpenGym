@@ -290,12 +290,18 @@ resource "aws_iam_role" "role" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "function_logging_policy_attachment" {
+  role       = aws_iam_role.role.id
+  policy_arn = aws_iam_policy.function_logging_policy.arn
+}
+
 resource "aws_lambda_function" "get_gym_lambda" {
   filename        = "../lambdas/getGymDetails/main.zip"
   function_name   = "get_gym"
   role            = aws_iam_role.role.arn
   handler         = "main.main"
   runtime         = "provided.al2023"
+  depends_on      = [aws_cloudwatch_log_group.get_gym_logs]  
 
   source_code_hash = filebase64sha256("../lambdas/getGymDetails/main.zip")
 }
@@ -306,6 +312,7 @@ resource "aws_lambda_function" "add_gym_lambda" {
   role            = aws_iam_role.role.arn
   handler         = "main.main"
   runtime         = "provided.al2023"
+  depends_on      = [ aws_cloudwatch_log_group.add_gym_integration ]
 
   source_code_hash = filebase64sha256("../lambdas/addGym/main.zip")
 }
@@ -316,6 +323,7 @@ resource "aws_lambda_function" "delete_gym_lambda" {
   role            = aws_iam_role.role.arn
   handler         = "main.main"
   runtime         = "provided.al2023"
+  depends_on      = [ aws_cloudwatch_log_group.delete_gym_logs ]
 
   source_code_hash = filebase64sha256("../lambdas/deleteGym/main.zip")
 }
@@ -326,6 +334,40 @@ resource "aws_lambda_function" "update_gym_lambda" {
   role            = aws_iam_role.role.arn
   handler         = "main.main"
   runtime         = "provided.al2023"
+  depends_on      = [ aws_cloudwatch_log_group.update_gym_logs ]
 
   source_code_hash = filebase64sha256("../lambdas/updateGym/main.zip")
 }
+
+resource "aws_cloudwatch_log_group" "get_gym_logs" {
+  name = "/aws/lambda/get_gym"
+  retention_in_days = 7
+  lifecycle {
+    prevent_destroy = false
+  }
+}
+
+resource "aws_cloudwatch_log_group" "add_gym_logs" {
+  name = "/aws/lambda/add_gym"
+  retention_in_days = 7
+  lifecycle {
+    prevent_destroy = false
+  }
+}
+
+resource "aws_cloudwatch_log_group" "update_gym_logs" {
+  name = "/aws/lambda/update_gym"
+  retention_in_days = 7
+  lifecycle {
+    prevent_destroy = false
+  }
+}
+
+resource "aws_cloudwatch_log_group" "delete_gym_logs" {
+  name = "/aws/lambda/delete_gym"
+  retention_in_days = 7
+  lifecycle {
+    prevent_destroy = false
+  }
+}
+
