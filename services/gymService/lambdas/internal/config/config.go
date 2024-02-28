@@ -5,8 +5,6 @@ import (
 	"log"
 	"os"
 	"time"
-
-	"github.com/joho/godotenv"
 )
 
 var (
@@ -15,7 +13,7 @@ var (
 )
 
 func Connect() *sql.DB {
-	err := godotenv.Load(".env")
+	// err := godotenv.Load(".env")
 
 	if err != nil {
 		log.Fatalf("Error getting env in config.go, not coming through %v \n", err)
