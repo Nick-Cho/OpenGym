@@ -22,12 +22,12 @@ func Connect() *sql.DB {
 	}
 
 	dbDriver := "mysql"
-	dbUser := "admin"
+	dbUser := "gym_admin"
 	dbPass := os.Getenv("DB_PASS")
 	dbName := "gym"
 	dbIp := os.Getenv("DB_IP")
 
-	db, err = sql.Open(dbDriver, dbUser+":"+dbPass+"@tcp("+dbIp+")/"+dbName)
+	db, err = sql.Open(dbDriver, dbUser+":"+dbPass+"@"+dbIp+"/"+dbName)
 
 	if err != nil {
 		log.Printf("Error %s when connecting to DB\n", err)

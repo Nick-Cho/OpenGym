@@ -10,6 +10,7 @@ import (
 	response "gymService/internal/responses"
 
 	"github.com/aws/aws-lambda-go/events"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type Handler struct{}
