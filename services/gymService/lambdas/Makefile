@@ -1,12 +1,12 @@
 define build_binaries
 	@echo "Building binaries..."
-	@GOOS=linux GOARCH=amd64 go build -o deleteGym/main deleteGym/main.go deleteGym/handler.go
+	@GOOS=linux GOARCH=arm64 go build -o getGymDetails/bootstrap getGymDetails/main.go getGymDetails/handler.go
 	@echo "Finished building binaries..."
 endef
 
 define zip_files
 	@echo "Zipping files..."
-	zip -j deleteGym/main.zip deleteGym/main
+	zip -j getGymDetails/bootstrap.zip getGymDetails/bootstrap
 	@echo "Finished zipping files..."
 endef
 
