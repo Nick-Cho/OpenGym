@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	b64 "encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -15,7 +16,7 @@ import (
 
 type Handler struct{}
 
-func (h *Handler) HandleRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	var requestBody map[string]string
 	if request.Body == "" {
 		log.Println("No request body provided")
