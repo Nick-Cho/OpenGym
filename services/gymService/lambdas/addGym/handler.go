@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	b64 "encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -17,36 +16,53 @@ import (
 type Handler struct{}
 
 func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	var requestBody map[string]string
+	var requestBody map[string]any
+
 	if request.Body == "" {
 		log.Println("No request body provided")
 		response := response.CreateMsgResp(400, "No request body provided")
 		return response, nil
 	}
 	db := config.Connect()
-	defer db.Close()
+	// sDec, _ := b64.StdEncoding.DecodeString(request.Body)
+	json.Unmarshal([]byte(request.Body), &requestBody)
 
-	sDec, _ := b64.StdEncoding.DecodeString(request.Body)
-	json.Unmarshal([]byte(sDec), &requestBody)
 	name := requestBody["name"]
 	address := requestBody["address"]
 	owner_id := requestBody["owner_id"]
-	is_commericial := requestBody["is_commericial"]
+	is_commercial := requestBody["is_commercial"]
 	fee := requestBody["fee"]
 	lat := requestBody["lat"]
 	lng := requestBody["lng"]
 
-	fmt.Printf("lat: %s, lng: %s", lat, lng)
-	fmt.Printf("name: %s, address: %s, owner_id: %s, is_commericial: %s, fee: %s", name, address, owner_id, is_commericial, fee)
-	sqlRequest := fmt.Sprintf("INSERT INTO Gym (name, address, owner_id, gym_type, is_commericial, fee) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')", name, address, owner_id, is_commericial, fee, lat, lng)
-	fmt.Printf("sql post request from addGym: %s", sqlRequest)
-	res, err := db.Exec(sqlRequest)
+	f_owner_id, _ := owner_id.(float64)
+	owner_id = int(f_owner_id)
+	f_is_commercial, _ := is_commercial.(float64)
+	is_commercial = int(f_is_commercial)
+
+	sqlRequest := fmt.Sprintf("INSERT INTO Gym (owner_id, name, address,  is_commercial, fee, lat, lng) VALUES ('%d', ?, '%s', '%d', '%f', '%s', '%s')", owner_id, address, is_commercial, fee, lat, lng)
+	stmt, err := db.Prepare(sqlRequest)
 	if err != nil {
-		log.Printf("Error %s when inserting into Gym table \n", err)
-		response := response.CreateMsgResp(400, fmt.Sprintf("Error inserting new entry into Gym table: %s", err))
+		log.Printf("Error %s when preparing sql statement \n", err)
+		response := response.CreateMsgResp(400, fmt.Sprintf("Error preparing sql statement: %s", err))
+		return response, nil
+	}
+	defer stmt.Close()
+	// fmt.Printf("sql post request from addGym: %s", stmt)
+	res, err := stmt.Exec(name)
+	if err != nil {
+		log.Printf("Error %s when executing sql statement \n", err)
+		response := response.CreateMsgResp(400, fmt.Sprintf("Error executing sql statement: %s", err))
 		return response, nil
 	}
 
+	// res, err := db.Exec(sqlRequest)
+	// if err != nil {
+	// 	log.Printf("Error %s when inserting into Gym table \n", err)
+	// 	response := response.CreateMsgResp(400, fmt.Sprintf("Error inserting new entry into Gym table: %s", err))
+	// 	return response, nil
+	// }
+	defer db.Close()
 	id, err := res.LastInsertId()
 	if err != nil {
 		log.Printf("Error %s when getting last inserted id \n", err)
