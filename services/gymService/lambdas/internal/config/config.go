@@ -24,7 +24,7 @@ func Connect() *sql.DB {
 	dbDriver := "mysql"
 	dbUser := "gym_admin"
 	dbPass := os.Getenv("DB_PASS")
-	dbName := "gym"
+	dbName := "gym_db_master"
 	dbIp := os.Getenv("DB_IP")
 
 	db, err = sql.Open(dbDriver, dbUser+":"+dbPass+"@tcp("+dbIp+")/"+dbName)
