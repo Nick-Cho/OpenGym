@@ -27,7 +27,7 @@ func Connect() *sql.DB {
 	dbName := "gym"
 	dbIp := os.Getenv("DB_IP")
 
-	db, err = sql.Open(dbDriver, dbUser+":"+dbPass+"@"+dbIp+"/"+dbName)
+	db, err = sql.Open(dbDriver, dbUser+":"+dbPass+"@tcp("+dbIp+")/"+dbName)
 
 	if err != nil {
 		log.Printf("Error %s when connecting to DB\n", err)
