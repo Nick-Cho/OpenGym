@@ -56,12 +56,6 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 		return response, nil
 	}
 
-	// res, err := db.Exec(sqlRequest)
-	// if err != nil {
-	// 	log.Printf("Error %s when inserting into Gym table \n", err)
-	// 	response := response.CreateMsgResp(400, fmt.Sprintf("Error inserting new entry into Gym table: %s", err))
-	// 	return response, nil
-	// }
 	defer db.Close()
 	id, err := res.LastInsertId()
 	if err != nil {
