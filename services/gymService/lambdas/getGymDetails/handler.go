@@ -14,9 +14,11 @@ import (
 type Handler struct{}
 
 type GymInfo struct {
-	OwnerId      int    `json:"gym_id"`
+	GymId        int    `json:"gym_id"`
+	OwnerId      int    `json:"owner_id"`
 	Name         string `json:"name"`
-	IsCommercial bool   `json:"is_commercial"`
+	Address      string `json:"address"`
+	IsCommercial int    `json:"is_commercial"`
 	Fee          int    `json:"fee"`
 	Lat          string `json:"lat"`
 	Lng          string `json:"lng"`
@@ -24,17 +26,22 @@ type GymInfo struct {
 
 func (h *Handler) HandleRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	db := config.Connect()
-	gym_id := request.QueryStringParameters["id"]
-	fmt.Printf("Request gym id : %s\n", gym_id) //temp
+	gym_id := request.QueryStringParameters["gym_id"]
+	log.Printf("Request gym id : %s\n", gym_id) //temp
 
-	sqlRequest := fmt.Sprintf("SELECT * FROM Gym WHERE id = %s", gym_id)
+	sqlRequest := fmt.Sprintf("SELECT * FROM Gym WHERE owner_id='%s'", gym_id)
 	res, err := db.Query(sqlRequest)
+
+	if err != nil {
+		log.Println("Error querying gym info: ", err)
+		return resp.CreateMsgResp(400, fmt.Sprintf("Error querying gym info: %s", err)), nil
+	}
 
 	// Formatting MySQL response to JSON
 	var gymInfo GymInfo
 	res.Next()
 
-	err = res.Scan(&gymInfo.OwnerId, &gymInfo.IsCommercial, &gymInfo.Fee, &gymInfo.Lat, &gymInfo.Lng, &gymInfo.Name)
+	err = res.Scan(&gymInfo.GymId, &gymInfo.OwnerId, &gymInfo.Name, &gymInfo.Address, &gymInfo.IsCommercial, &gymInfo.Fee, &gymInfo.Lat, &gymInfo.Lng)
 	if err != nil {
 		log.Println("Error scanning gym info: ", err)
 		return resp.CreateMsgResp(400, fmt.Sprintf("Error getting last inserted id: %s", err)), nil

@@ -107,6 +107,41 @@ resource "aws_api_gateway_resource" "gym_apigw_res" {
   path_part           = "gym"
 }
 
+
+resource "aws_api_gateway_model" "gymModel" {
+  rest_api_id = aws_api_gateway_rest_api.gym_apigw.id
+  name        = "gymModel"
+  content_type = "application/json"
+  schema  = <<EOF
+  {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "address": {
+        "type": "string"
+      },
+      "owner_id": {
+        "type": "string"
+      },
+      "is_commercial": {
+        "type": "boolean"
+      },
+      "fee": {
+        "type": "number"
+      },
+      "lat": {
+        "type": "number"
+      },
+      "lng": {
+        "type": "number"
+      }
+    }
+  }
+  EOF
+}
+
 resource "aws_api_gateway_method" "get_gym" {
   rest_api_id         = aws_api_gateway_rest_api.gym_apigw.id
   resource_id         = aws_api_gateway_resource.gym_apigw_res.id
@@ -123,16 +158,6 @@ resource "aws_api_gateway_method" "add_gym" {
   resource_id         = aws_api_gateway_resource.gym_apigw_res.id
   http_method         = "POST"
   authorization       = "NONE"
-
-  # request_parameters = {
-  #   "method.request.body.name" = true
-  #   "method.request.body.address" = true
-  #   "method.request.body.owner_id" = true
-  #   "method.request.body.is_commercial" = true
-  #   "method.request.body.fee" = true
-  #   "method.request.body.lat" = true
-  #   "method.request.body.lng" = true
-  # }
 }
 
 resource "aws_api_gateway_method" "update_gym" {
@@ -140,10 +165,6 @@ resource "aws_api_gateway_method" "update_gym" {
   resource_id         = aws_api_gateway_resource.gym_apigw_res.id
   http_method         = "PUT"
   authorization       = "NONE"
-
-  # request_parameters = {
-  #   "method.request.body.gym_id" = true
-  # }
 }
 
 resource "aws_api_gateway_method" "delete_gym" {
@@ -170,7 +191,7 @@ resource "aws_api_gateway_integration" "get_gym_integration" {
   request_templates = {
     "application/xml" = <<EOF
   {
-    "body" : $input.json('$')
+    "body" : $input.body
   }
   EOF
   }
@@ -189,7 +210,7 @@ resource "aws_api_gateway_integration" "update_gym_integration" {
   request_templates = {
     "application/xml" = <<EOF
   {
-    "body" : $input.json('$')
+    "body" : $input.body
   }
   EOF
   }
@@ -208,7 +229,7 @@ resource "aws_api_gateway_integration" "add_gym_integration" {
   request_templates = {
     "application/xml" = <<EOF
   {
-    "body" : $input.json('$')
+    "body" : $input.body
   }
   EOF
   }
@@ -227,7 +248,7 @@ resource "aws_api_gateway_integration" "delete_gym_integration" {
   request_templates = {
     "application/xml" = <<EOF
   {
-    "body" : $input.json('$')
+    "body" : $input.body
   }
   EOF
   }
@@ -290,53 +311,71 @@ resource "aws_iam_role" "role" {
   })
 }
 
+resource "aws_iam_policy" "function_logging_policy" {
+  name = "function_logging_policy"
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource": "arn:aws:logs:*:*:*"
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "function_logging_policy_attachment" {
   role       = aws_iam_role.role.id
   policy_arn = aws_iam_policy.function_logging_policy.arn
 }
 
 resource "aws_lambda_function" "get_gym_lambda" {
-  filename        = "../lambdas/getGymDetails/main.zip"
+  filename        = "../lambdas/getGymDetails/bootstrap.zip"
   function_name   = "get_gym"
   role            = aws_iam_role.role.arn
-  handler         = "main.main"
+  handler         = "main"
   runtime         = "provided.al2023"
   depends_on      = [aws_cloudwatch_log_group.get_gym_logs]  
 
-  source_code_hash = filebase64sha256("../lambdas/getGymDetails/main.zip")
+  source_code_hash = filebase64sha256("../lambdas/getGymDetails/bootstrap.zip")
 }
 
 resource "aws_lambda_function" "add_gym_lambda" {
-  filename        = "../lambdas/addGym/main.zip"
+  filename        = "../lambdas/addGym/bootstrap.zip"
   function_name   = "add_gym"
   role            = aws_iam_role.role.arn
-  handler         = "main.main"
+  handler         = "main"
   runtime         = "provided.al2023"
-  depends_on      = [ aws_cloudwatch_log_group.add_gym_integration ]
+  depends_on      = [ aws_cloudwatch_log_group.add_gym_logs ]
 
-  source_code_hash = filebase64sha256("../lambdas/addGym/main.zip")
+  source_code_hash = filebase64sha256("../lambdas/addGym/bootstrap.zip")
 }
 
 resource "aws_lambda_function" "delete_gym_lambda" {
-  filename        = "../lambdas/deleteGym/main.zip"
+  filename        = "../lambdas/deleteGym/bootstrap.zip"
   function_name   = "delete_gym"
   role            = aws_iam_role.role.arn
-  handler         = "main.main"
+  handler         = "main"
   runtime         = "provided.al2023"
   depends_on      = [ aws_cloudwatch_log_group.delete_gym_logs ]
 
-  source_code_hash = filebase64sha256("../lambdas/deleteGym/main.zip")
+  source_code_hash = filebase64sha256("../lambdas/deleteGym/bootstrap.zip")
 }
 
 resource "aws_lambda_function" "update_gym_lambda" {
-  filename        = "../lambdas/updateGym/main.zip"
+  filename        = "../lambdas/updateGym/bootstrap.zip"
   function_name   = "update_gym"
   role            = aws_iam_role.role.arn
-  handler         = "main.main"
+  handler         = "main"
   runtime         = "provided.al2023"
   depends_on      = [ aws_cloudwatch_log_group.update_gym_logs ]
 
-  source_code_hash = filebase64sha256("../lambdas/updateGym/main.zip")
+  source_code_hash = filebase64sha256("../lambdas/updateGym/bootstrap.zip")
 }
 
 resource "aws_cloudwatch_log_group" "get_gym_logs" {
