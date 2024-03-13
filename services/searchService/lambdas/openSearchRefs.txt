@@ -1,3 +1,7 @@
-Uploading a Single Document
----------------------------
-curl -XPUT -u 'master-user:master-user-password' 'domain-endpoint/movies/_doc/1' -d '{"director": "Burton, Tim", "genre": ["Comedy","Sci-Fi"], "year": 1996, "actor": ["Jack Nicholson","Pierce Brosnan","Sarah Jessica Parker"], "title": "Mars Attacks!"}' -H 'Content-Type: application/json'
+Uploading a Single Document (Altered)
+-------------------------------------
+curl -XPUT -u 'master:master' 'https://search-opengym-os-jic4j2he6yjwp6oajo7xzbf6hm.us-east-1.es.amazonaws.com/dir-path' -d (JSON to insert here. JSON curly brace must wrapped in single quotes) -H 'Content-Type: application/json'
+
+Searching for Document Using API 
+--------------------------------
+curl -XGET -u 'master:master' 'https://search-opengym-os-jic4j2he6yjwp6oajo7xzbf6hm.us-east-1.es.amazonaws.com/dir-path/search-parameters'
