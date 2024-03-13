@@ -29,7 +29,9 @@ resource "aws_opensearch_domain_policy" "main" {
     Statement = [
       {
         Effect    = "Allow",
-        Principal = "*",
+        Principal = {
+          "Service": "lambda.amazonaws.com"
+        },
         Action    = [
           "es:ESHttpGet",
           "es:ESHttpHead",
