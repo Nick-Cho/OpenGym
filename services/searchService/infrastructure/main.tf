@@ -44,3 +44,110 @@ resource "aws_opensearch_domain_policy" "main" {
     ]
   })
 }
+
+resource "aws_iam_policy" "opensearch_lambda_policy" {
+  name        = "opensearch_lambda_policy"
+  description = "Policy for opensearch lambda"
+  policy      = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = "es:*",
+        Resource = aws_opensearch_domain.opengym-os.arn
+      }
+    ]
+  })
+}
+
+data "aws_iam_policy_document" "assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+resource "aws_iam_policy" "uploadGym_invoke_policy" {
+  name        = "lambda_invoke_policy"
+  description = "Policy for invoking lambda"
+  policy      = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = "lambda:InvokeFunction",
+        Resource = aws_lambda_function.os_uploadGym.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role" "uploadGym_lambda_role" {
+  name               = "uploadGym_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
+resource "aws_cloudwatch_log_group" "os_uploadGym" {
+  name = "/aws/lambda/os_uploadGym"
+  retention_in_days = 7
+}
+
+resource "aws_iam_policy" "lambda_logging_policy" {
+  name        = "lambda_logging_policy"
+  description = "Policy for logging lambda"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect    = "Allow",
+        Action    = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Resource = "arn:aws:logs:*:*:*"
+      }
+    ]
+    }
+  )
+}
+
+resource "aws_iam_policy_attachment" "uploadGym_lambda_logging" {
+  name       = "uploadGym_lambda_logging"
+  policy_arn = aws_iam_policy.lambda_logging_policy.arn
+  roles      = [aws_iam_role.uploadGym_lambda_role.name]
+}
+
+resource "aws_iam_policy_attachment" "uploadGym_lambda_invoke_attachment" {
+  name        = "uploadGym_lambda_invoke_attachment"
+  policy_arn  = aws_iam_policy.uploadGym_invoke_policy.arn
+  roles       = [aws_iam_role.uploadGym_lambda_role.name]
+}
+
+data "archive_file" "uploadGym_lambda" {
+  type        = "zip"
+  source_file = "../lambdas/uploadGym/bootstrap"
+  output_path = "../lambdas/uploadGym/bootstrap.zip"
+}
+
+resource "aws_lambda_function" "os_uploadGym" {
+  function_name = "os_uploadGym"
+  role          = aws_iam_role.uploadGym_lambda_role.arn
+  handler       = "main"
+  source_code_hash = data.archive_file.uploadGym_lambda.output_base64sha256
+
+  filename      = data.archive_file.uploadGym_lambda.output_path
+
+  runtime       = "provided.al2023"
+  depends_on    = [
+    aws_iam_policy_attachment.uploadGym_lambda_logging,
+    aws_cloudwatch_log_group.os_uploadGym
+  ]
+}
+

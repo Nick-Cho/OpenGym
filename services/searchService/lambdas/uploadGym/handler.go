@@ -50,7 +50,7 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 	is_commercial = int(f_is_commercial)
 
 	geohash := gh.Encode(lat.(float64), lng.(float64))
-
+	geohash = geohash[:6]
 	gym := osGymObj{
 		Name:         name.(string),
 		Address:      address.(string),
