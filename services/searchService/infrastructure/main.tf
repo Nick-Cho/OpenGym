@@ -59,7 +59,7 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 resource "aws_iam_policy" "uploadGym_invoke_policy" {
-  name        = "lambda_invoke_policy"
+  name        = "uploadGym_invoke_policy"
   description = "Policy for invoking lambda"
   policy      = jsonencode({
     Version = "2012-10-17",
@@ -67,7 +67,7 @@ resource "aws_iam_policy" "uploadGym_invoke_policy" {
       {
         Effect   = "Allow",
         Action   = "lambda:InvokeFunction",
-        Resource = aws_lambda_function.os_uploadGym.arn
+        Resource = "*"
       }
     ]
   })
@@ -138,7 +138,7 @@ resource "aws_lambda_function" "os_uploadGym" {
 
 
 resource "aws_iam_policy" "getNearbyGyms_invoke_policy" {
-  name        = "lambda_invoke_policy"
+  name        = "getNearbyGyms_invoke_policy"
   description = "Policy for invoking lambda"
   policy      = jsonencode({
     Version = "2012-10-17",
@@ -146,7 +146,7 @@ resource "aws_iam_policy" "getNearbyGyms_invoke_policy" {
       {
         Effect   = "Allow",
         Action   = "lambda:InvokeFunction",
-        Resource = aws_lambda_function.os_getNearbyGyms.arn
+        Resource = "*"
       }
     ]
   })
