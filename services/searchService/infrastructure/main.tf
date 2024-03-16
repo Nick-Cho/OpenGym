@@ -194,3 +194,99 @@ resource "aws_lambda_function" "os_getNearbyGyms" {
     aws_cloudwatch_log_group.os_getNearbyGyms
   ]
 }
+
+
+resource "aws_api_gateway_rest_api" "search_api" {
+  name        = "search_api"
+  description = "API for searching Gyms in OpenSearch"
+}
+
+resource "aws_api_gateway_resource" "uploadGym_route" {
+  rest_api_id = aws_api_gateway_rest_api.search_api.id
+  parent_id   = aws_api_gateway_rest_api.search_api.root_resource_id
+  path_part   = "uploadGym"
+}
+
+# resource "aws_api_gateway_model" "gymModel" {
+#   rest_api_id  = aws_api_gateway_rest_api.search_api.id
+#   name         = "gymModel"
+#   content_type = "application/json"
+#   schema = <<EOF
+#   {
+#     "type": "object",
+#     "properties": {
+#       "name": {
+#         "type": "string"
+#       },
+#       "address": {
+#         "type": "string"
+#       },
+#       "owner_id": {
+#         "type": "string"
+#       },
+#       "is_commercial": {
+#         "type": "boolean"
+#       },
+#       "fee": {
+#         "type": "number"
+#       },
+#       "lat": {
+#         "type": "number"
+#       },
+#       "lng": {
+#         "type": "number"
+#       }
+#     }
+#   }
+#   EOF
+# }
+
+resource "aws_api_gateway_method" "uploadGym_method" {
+  rest_api_id   = aws_api_gateway_rest_api.search_api.id
+  resource_id   = aws_api_gateway_resource.uploadGym_route.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "uploadGym_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.search_api.id
+  resource_id             = aws_api_gateway_resource.uploadGym_route.id
+  http_method             = aws_api_gateway_method.uploadGym_method.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.os_uploadGym.invoke_arn
+}
+
+resource "aws_api_gateway_resource" "getNearbyGyms_route" {
+  rest_api_id = aws_api_gateway_rest_api.search_api.id
+  parent_id   = aws_api_gateway_rest_api.search_api.root_resource_id
+  path_part   = "getNearbyGyms"
+}
+
+resource "aws_api_gateway_method" "getNearbyGyms_method" {
+  rest_api_id   = aws_api_gateway_rest_api.search_api.id
+  resource_id   = aws_api_gateway_resource.getNearbyGyms_route.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "getNearbyGyms_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.search_api.id
+  resource_id             = aws_api_gateway_resource.getNearbyGyms_route.id
+  http_method             = aws_api_gateway_method.getNearbyGyms_method.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.os_getNearbyGyms.invoke_arn
+}
+
+resource "aws_api_gateway_stage" "test_stage" {
+  deployment_id = aws_api_gateway_deployment.search_api_deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.search_api.id
+  stage_name    = "test"
+}
+
+resource "aws_api_gateway_deployment" "search_api_deployment" {
+  depends_on = [aws_api_gateway_integration.uploadGym_integration, aws_api_gateway_intergration.getNearbyGyms_integration]
+  rest_api_id = aws_api_gateway_rest_api.search_api.id
+  stage_name  = "dev"
+}
