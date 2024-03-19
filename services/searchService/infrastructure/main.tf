@@ -286,7 +286,7 @@ resource "aws_api_gateway_stage" "test_stage" {
 }
 
 resource "aws_api_gateway_deployment" "search_api_deployment" {
-  depends_on = [aws_api_gateway_integration.uploadGym_integration, aws_api_gateway_intergration.getNearbyGyms_integration]
+  depends_on = [aws_api_gateway_integration.uploadGym_integration, aws_api_gateway_integration.getNearbyGyms_integration]
   rest_api_id = aws_api_gateway_rest_api.search_api.id
   stage_name  = "dev"
 }

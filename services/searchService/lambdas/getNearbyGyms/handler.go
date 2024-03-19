@@ -44,7 +44,7 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 		return response, nil
 	}
 	payload := string(reqBody)
-	curl := fmt.Sprintf("curl -XGET -u 'master:master' 'https://search-opengym-os-jic4j2he6yjwp6oajo7xzbf6hm.us-east-1.es.amazonaws.com/dir-path/%s'", payload)
+	curl := fmt.Sprintf("curl -XGET -u 'master:master' 'https://search-opengym-os-jic4j2he6yjwp6oajo7xzbf6hm.us-east-1.es.amazonaws.com/gymLocation/_doc/%s'", payload)
 	output, err := exec.Command("sh", "-c", curl).Output()
 
 	if err != nil {

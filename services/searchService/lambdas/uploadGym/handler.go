@@ -19,7 +19,7 @@ type osGymObj struct {
 	Address      string  `json:"address"`
 	OwnerId      int     `json:"owner_id"`
 	IsCommercial int     `json:"is_commercial"`
-	Fee          string  `json:"fee"`
+	Fee          float64 `json:"fee"`
 	Lat          float64 `json:"lat"`
 	Lng          float64 `json:"lng"`
 	GeoHash      string  `json:"geohash"`
@@ -35,7 +35,7 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 		response := response.CreateMsgResp(400, "No request body provided")
 		return response, nil
 	}
-
+	json.Unmarshal([]byte(request.Body), &requestBody)
 	name := requestBody["name"]
 	address := requestBody["address"]
 	owner_id := requestBody["owner_id"]
@@ -49,18 +49,23 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 	f_is_commercial, _ := is_commercial.(float64)
 	is_commercial = int(f_is_commercial)
 
-	geohash := gh.Encode(lat.(float64), lng.(float64))
+	// fmt.Printf("Name: %s,Lat: %s, Lng: %s", name, lat, lng)
+	f_lat := lat.(float64)
+	f_lng := lng.(float64)
+	geohash := gh.Encode(f_lat, f_lng)
 	geohash = geohash[:6]
+
 	gym := osGymObj{
 		Name:         name.(string),
 		Address:      address.(string),
 		OwnerId:      owner_id.(int),
 		IsCommercial: is_commercial.(int),
-		Fee:          fee.(string),
-		Lat:          lat.(float64),
-		Lng:          lng.(float64),
+		Fee:          fee.(float64),
+		Lat:          f_lat,
+		Lng:          f_lng,
 		GeoHash:      geohash,
 	}
+
 	gymJson, err := json.Marshal(gym)
 	if err != nil {
 		log.Println("Error marshalling gym object", err)
