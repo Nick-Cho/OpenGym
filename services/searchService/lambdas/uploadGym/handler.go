@@ -73,11 +73,13 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 		return response, nil
 	}
 	payload := string(gymJson)
-	curl := fmt.Sprintf("curl -XPOST -u 'master:master' 'https://search-opengym-os-jic4j2he6yjwp6oajo7xzbf6hm.us-east-1.es.amazonaws.com/gymLocation/_doc' -d %s -H 'Content-Type: application/json'", payload)
+	log.Println("Payload: ", payload)
+	curl := fmt.Sprintf("curl -X POST --max-time 10 --insecure -u 'master:$Master1' 'https://search-opengym-os-jic4j2he6yjwp6oajo7xzbf6hm.us-east-1.es.amazonaws.com/gymlocation/_doc/' -H 'Content-Type: application/json' -d '%s'  ", payload)
+	log.Println("cURL command: ", curl)
 	output, err := exec.Command("sh", "-c", curl).Output()
 
 	if err != nil {
-		fmt.Println("Error executing cURL command:", err)
+		log.Println("Error executing cURL command:", err)
 		response := response.CreateMsgResp(400, "Error executing cURL command")
 		return response, nil
 	}

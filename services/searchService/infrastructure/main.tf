@@ -3,19 +3,31 @@ resource "aws_opensearch_domain" "opengym-os" {
     engine_version = "Elasticsearch_7.10"
     
     cluster_config {
-        instance_type = "t2.small.search"
+        instance_type = "t3.small.search"
     }
 
     advanced_security_options {
-        enabled                        = false
+        enabled                        = true
         anonymous_auth_enabled         = true
         internal_user_database_enabled = true
         master_user_options {
-            master_user_name     = "master"
-            master_user_password = "master"
+            master_user_name     = "master_user"
+            master_user_password = "$Master_pswd1"
         }
     }
-    
+
+    encrypt_at_rest {
+      enabled = true
+    }
+
+    domain_endpoint_options {
+      enforce_https       = true
+      tls_security_policy = "Policy-Min-TLS-1-2-2019-07"
+    }
+
+    node_to_node_encryption {
+      enabled = true
+    }
     ebs_options {
         ebs_enabled = true
         volume_size = 10
@@ -146,7 +158,7 @@ resource "aws_iam_policy" "getNearbyGyms_invoke_policy" {
       {
         Effect   = "Allow",
         Action   = "lambda:InvokeFunction",
-        Resource = "*"
+        Resource = "*",
       }
     ]
   })

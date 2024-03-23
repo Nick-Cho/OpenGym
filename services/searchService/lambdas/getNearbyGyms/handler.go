@@ -26,8 +26,9 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 
 	lat := requestBody["lat"]
 	lng := requestBody["lng"]
-
-	geohash := gh.Encode(lat.(float64), lng.(float64))
+	f_lat := lat.(float64)
+	f_lng := lng.(float64)
+	geohash := gh.Encode(f_lat, f_lng)
 	geohash = geohash[:4]
 	geohash += ".*"
 	query := map[string]interface{}{
