@@ -1,9 +1,9 @@
 package openSearchTypes
 
 type Hits struct {
-	Index  string `json:"_index"`
-	ID     string `json:"_id"`
-	Score  int    `json:"_score"`
+	Index  string  `json:"_index"`
+	ID     string  `json:"_id"`
+	Score  float64 `json:"_score"`
 	Source struct {
 		Name         string  `json:"name"`
 		Address      string  `json:"address"`
