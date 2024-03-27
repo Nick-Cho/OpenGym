@@ -38,3 +38,30 @@ resource "aws_api_gateway_rest_api" "booking_api" {
     name = "booking_api"
     description = "Booking API"
 }
+
+resource "aws_api_gateway_resource" "booking_resource" {
+    rest_api_id = aws_api_gateway_rest_api.booking_api.id
+    parent_id = aws_api_gateway_rest_api.booking_api.root_resource_id
+    path_part = "book"
+}
+
+resource "aws_api_gateway_method" "booking_method" {
+    rest_api_id = aws_api_gateway_rest_api.booking_api.id
+    resource_id = aws_api_gateway_resource.booking_resource.id
+    http_method = "POST"
+    authorization = "NONE"
+}
+
+resource "aws_api_gateway_resource" "cancel_resource" {
+    rest_api_id = aws_api_gateway_rest_api.booking_api.id
+    parent_id = aws_api_gateway_rest_api.booking_api.root_resource_id
+    path_part = "cancel_booking"
+}
+
+resource "aws_api_gateway_method" "cancel_method" {
+    rest_api_id = aws_api_gateway_rest_api.booking_api.id
+    resource_id = aws_api_gateway_resource.cancel_resource.id
+    http_method = "POST"
+    authorization = "NONE"
+}
+
