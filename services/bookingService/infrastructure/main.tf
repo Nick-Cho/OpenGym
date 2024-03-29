@@ -4,8 +4,8 @@
 resource "aws_db_instance" "booking_db" {
     allocated_storage = 10 # Min in the console is 20
     db_name = "booking_db"
-    engine = "postgresql"
-    engine_version = "16.1-R2"
+    engine = "mysql"
+    engine_version = "5.7"
     instance_class = "db.t2.micro" # Min in the console is db.t3.micro
     username = "master"
     password = "master"
