@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"log"
 
-	config "gymService/internal/config"
-	response "gymService/internal/responses"
+	config "bookingService/internal/config"
+	response "bookingService/internal/responses"
 
 	"github.com/aws/aws-lambda-go/events"
 	_ "github.com/go-sql-driver/mysql"
@@ -44,8 +44,8 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 	json.Unmarshal([]byte(request.Body), &requestBody)
 	slot_id := requestBody["slot_id"]
 
-	slot_id = slot_id.(float64)
-	slot_id = int(slot_id)
+	f_slot_id := slot_id.(float64)
+	slot_id = int(f_slot_id)
 	// Optimistic Concurrency
 	sqlReq := fmt.Sprintf("SELECT * FROM TimeSlots WHERE SlotId='%d", slot_id)
 	res, err := db.Query(sqlReq)
