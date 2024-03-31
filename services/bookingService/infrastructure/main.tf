@@ -30,7 +30,10 @@ resource "aws_security_group" "booking_db_sg" {
         cidr_blocks = ["0.0.0.0/0"]
     }
 }
-
+# -----------------------------------------------------------
+# Lambda Configurations
+# -----------------------------------------------------------
+resource 
 # -----------------------------------------------------------
 # API Gateway Configuration
 # -----------------------------------------------------------
@@ -52,6 +55,15 @@ resource "aws_api_gateway_method" "booking_method" {
     authorization = "NONE"
 }
 
+resource "aws_api_gateway_integration" "booking_integration" {
+    rest_api_id = aws_api_gateway_rest_api.booking_api.id
+    resource_id = aws_api_gateway_resource.booking_resource.id
+    http_method = aws_api_gateway_method.booking_method.http_method
+    integration_http_method = "POST"
+    type = "AWS_PROXY"
+    uri = 
+}
+
 resource "aws_api_gateway_resource" "cancel_resource" {
     rest_api_id = aws_api_gateway_rest_api.booking_api.id
     parent_id = aws_api_gateway_rest_api.booking_api.root_resource_id
@@ -63,5 +75,58 @@ resource "aws_api_gateway_method" "cancel_method" {
     resource_id = aws_api_gateway_resource.cancel_resource.id
     http_method = "POST"
     authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "cancel_integration" {
+    rest_api_id = aws_api_gateway_rest_api.booking_api.id
+    resource_id = aws_api_gateway_resource.cancel_resource.id
+    http_method = aws_api_gateway_method.cancel_method.http_method
+    integration_http_method = "POST"
+    type = "AWS_PROXY"
+    uri = 
+}
+
+resource "aws_api_gateway_resource" "create_slots_resource" {
+    rest_api_id = aws_api_gateway_rest_api.booking_api.id
+    parent_id = aws_api_gateway_rest_api.booking_api.root_resource_id
+    path_part = "create_slots"
+}
+
+resource "aws_api_gateway_method" "create_slots_method" {
+    rest_api_id = aws_api_gateway_rest_api.booking_api.id
+    resource_id = awS_api_gateway_resource.create_slots_resource.id
+    http_method = "POST"
+    authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "create_slots_integration" {
+    rest_api_id = aws_api_gateway_rest_api.booking_api.id
+    resource_id = aws_api_gateway_resource.create_slots_resource.id
+    http_method = aws_api_gateway_method.create_slots_method.http_method
+    integration_http_method = "POST"
+    type = "AWS_PROXY"
+    uri = 
+}
+
+resource "aws_api_gateway_resource" "get_bookings_resource" {
+    rest_api_id = aws_api_gateway_rest_api.booking_api.id
+    parent_id = aws_api_gateway_rest_api.booking_api.root_resource_id
+    path_part = "get_bookings"
+}
+
+resource "aws_api_gateway_method" "get_bookings_method" {
+    rest_api_id = aws_api_gateway_rest_api.booking_api.id
+    resource_id = awS_api_gateway_resource.get_bookings_resource.id
+    http_method = "POST"
+    authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "get_bookings_integration" {
+    rest_api_id = aws_api_gateway_rest_api.booking_api.id
+    resource_id = aws_api_gateway_resource.get_bookings_resource.id
+    http_method = aws_api_gateway_method.get_bookings_method.http_method
+    integration_http_method = "POST"
+    type = "AWS_PROXY"
+    uri = 
 }
 
