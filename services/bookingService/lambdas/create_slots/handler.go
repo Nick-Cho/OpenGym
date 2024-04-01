@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"log"
 
-	config "gymService/internal/config"
-	response "gymService/internal/responses"
+	config "bookingService/internal/config"
+	response "bookingService/internal/responses"
 
 	"github.com/aws/aws-lambda-go/events"
 	_ "github.com/go-sql-driver/mysql"
@@ -52,7 +52,7 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 		response := response.CreateMsgResp(400, fmt.Sprintf("Error executing sql statement: %s", err))
 		return response, nil
 	}
-	defer db.close()
+	defer db.Close()
 	id, err := res.LastInsertId()
 	if err != nil {
 		log.Printf("Error %s when getting last inserted id \n", err)

@@ -54,7 +54,7 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 	}
 
 	var timeSlots TimeSlotsInfo
-	res.next()
+	res.Next()
 
 	err = res.Scan(&timeSlots.SlotId, &timeSlots.GymId, &timeSlots.StartTime, &timeSlots.EndTime, &timeSlots.Date, &timeSlots.MaxSlots, &timeSlots.AvailableSlots, &timeSlots.Version)
 
@@ -63,12 +63,12 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 		return response.CreateMsgResp(400, fmt.Sprintf("Error scanning booking info: %s", err)), nil
 	}
 
-	res, err = json.Marshal(timeSlots)
+	output, err := json.Marshal(timeSlots)
 	if err != nil {
 		log.Println("ERROR MARSHALLING RESPONSE BODY TO JSON", err)
 		return response.CreateMsgResp(400, fmt.Sprintf("Error marshalling response body to JSON: %s", err)), nil
 	}
 
-	return response.CreateMsgResp(200, string(res)), nil
+	return response.CreateMsgResp(200, string(output)), nil
 
 }
