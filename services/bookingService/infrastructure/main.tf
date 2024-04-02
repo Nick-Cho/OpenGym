@@ -251,7 +251,7 @@ resource "aws_api_gateway_integration" "booking_integration" {
     http_method = aws_api_gateway_method.booking_method.http_method
     integration_http_method = "POST"
     type = "AWS_PROXY"
-    uri = 
+    uri = aws_lambda_function.book_lambda.invoke_arn
 }
 
 resource "aws_api_gateway_resource" "cancel_resource" {
@@ -273,7 +273,7 @@ resource "aws_api_gateway_integration" "cancel_integration" {
     http_method = aws_api_gateway_method.cancel_method.http_method
     integration_http_method = "POST"
     type = "AWS_PROXY"
-    uri = 
+    uri = aws_lambda_function.cancelBooking_lambda.invoke_arn
 }
 
 resource "aws_api_gateway_resource" "create_slots_resource" {
@@ -295,7 +295,7 @@ resource "aws_api_gateway_integration" "create_slots_integration" {
     http_method = aws_api_gateway_method.create_slots_method.http_method
     integration_http_method = "POST"
     type = "AWS_PROXY"
-    uri = 
+    uri = aws_lambda_function.createSlots_lambda.invoke_arn
 }
 
 resource "aws_api_gateway_resource" "get_bookings_resource" {
@@ -317,6 +317,17 @@ resource "aws_api_gateway_integration" "get_bookings_integration" {
     http_method = aws_api_gateway_method.get_bookings_method.http_method
     integration_http_method = "POST"
     type = "AWS_PROXY"
-    uri = 
+    uri = aws_lambda_function.getBookings_lambda.invoke_arn
 }
 
+resource "aws_api_gateway_stage" "test_stage" {
+  deployment_id = aws_api_gateway_deployment.booking_api_deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.booking_api.id
+  stage_name    = "dev_bookingService"
+}
+
+resource "aws_api_gateway_deployment" "booking_api_deployment" {
+  depends_on = [aws_api_gateway_integration.booking_integration, aws_api_gateway_integration.cancelBooking_integration, aws_api_gateway_integration.createSlots_integration, aws_api_gateway_integration.getBookings_integration]
+  rest_api_id = aws_api_gateway_rest_api.booking_api.id
+  stage_name  = "dev_bookingService"
+}
