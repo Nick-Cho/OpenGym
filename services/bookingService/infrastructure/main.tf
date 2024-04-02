@@ -135,6 +135,30 @@ resource "aws_iam_policy_attachment" "getBookings_invoke_attachment" {
   roles       = [aws_iam_role.getBookings_lambda_role.name]
 }
 
+resource "aws_iam_policy_attachment" "book_lambda_logging" {
+  name       = "book_lambda_logging"
+  policy_arn = aws_iam_policy.lambda_logging_policy.arn
+  roles      = [aws_iam_role.book_lambda_role.name]
+}
+
+resource "aws_iam_policy_attachment" "cancelBooking_lambda_logging" {
+  name       = "cancelBooking_lambda_logging"
+  policy_arn = aws_iam_policy.lambda_logging_policy.arn
+  roles      = [aws_iam_role.cancelBooking_lambda_role.name]
+}
+
+resource "aws_iam_policy_attachment" "createSlots_lambda_logging" {
+  name       = "createSlots_lambda_logging"
+  policy_arn = aws_iam_policy.lambda_logging_policy.arn
+  roles      = [aws_iam_role.createSlots_lambda_role.name]
+}
+
+resource "aws_iam_policy_attachment" "getBookings_lambda_logging" {
+  name       = "getBookings_lambda_logging"
+  policy_arn = aws_iam_policy.lambda_logging_policy.arn
+  roles      = [aws_iam_role.getBookings_lambda_role.name]
+}
+
 # -----------------------------------------------------------
 # Lambda Configurations
 # -----------------------------------------------------------
