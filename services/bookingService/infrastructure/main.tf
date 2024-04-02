@@ -30,10 +30,176 @@ resource "aws_security_group" "booking_db_sg" {
         cidr_blocks = ["0.0.0.0/0"]
     }
 }
+
+# -----------------------------------------------------------
+# CloudWatch Configuration
+# -----------------------------------------------------------
+
+resource "aws_cloudwatch_log_group" "book_log_group" {
+    name = "/aws/lambda/book"
+    retention_in_days = 2
+}
+
+resource "aws_cloudwatch_log_group" "createSlots_log_group" {
+    name = "/aws/lambda/createSlots"
+    retention_in_days = 2
+}
+resource "aws_cloudwatch_log_group" "cancelBooking_log_group" {
+    name = "/aws/lambda/cancelBooking"
+    retention_in_days = 2
+}
+resource "aws_cloudwatch_log_group" "getBooking_log_group" {
+    name = "/aws/lambda/getBooking"
+    retention_in_days = 2
+}
+
+# -----------------------------------------------------------
+# IAM Role Configuration
+# ----------------------------------------------------------- 
+resource "aws_iam_policy" "invoke_policy" {
+  name        = "invoke_policy"
+  description = "Policy for invoking lambda"
+  policy      = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = "lambda:InvokeFunction",
+        Resource = "*",
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "lambda_logging_policy" {
+  name        = "lambda_logging_policy"
+  description = "Policy for logging lambda"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect    = "Allow",
+        Action    = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Resource = "arn:aws:logs:*:*:*"
+      }
+    ]
+    }
+  )
+}
+
+resource "aws_iam_role" "book_lambda_role" {
+  name               = "book_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
+resource "aws_iam_role" "cancelBooking_lambda_role" {
+  name               = "cancelBooking_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
+resource "aws_iam_role" "createSlots_lambda_role" {
+  name               = "createSlots_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
+resource "aws_iam_role" "getBookings_lambda_role" {
+  name               = "getBookings_lambda_role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
+resource "aws_iam_policy_attachment" "book_invoke_attachment" {
+  name        = "book_lambda_invoke_attachment"
+  policy_arn  = aws_iam_policy.invoke_policy.arn
+  roles       = [aws_iam_role.book_lambda_role.name]
+}
+
+resource "aws_iam_policy_attachment" "cancelBooking_invoke_attachment" {
+  name        = "cancelBooking_lambda_invoke_attachment"
+  policy_arn  = aws_iam_policy.invoke_policy.arn
+  roles       = [aws_iam_role.cancelBooking_lambda_role.name]
+}
+
+resource "aws_iam_policy_attachment" "createSlots_invoke_attachment" {
+  name        = "createSlots_lambda_invoke_attachment"
+  policy_arn  = aws_iam_policy.invoke_policy.arn
+  roles       = [aws_iam_role.createSlots_lambda_role.name]
+}
+
+resource "aws_iam_policy_attachment" "getBookings_invoke_attachment" {
+  name        = "getBookings_lambda_invoke_attachment"
+  policy_arn  = aws_iam_policy.invoke_policy.arn
+  roles       = [aws_iam_role.getBookings_lambda_role.name]
+}
+
 # -----------------------------------------------------------
 # Lambda Configurations
 # -----------------------------------------------------------
-resource 
+
+data "archive_file" "book_lambda" {
+    type = "zip"
+    source_file = "../lambdas/book/bootstrap"
+    output_path = "../lambdas/book/bootstrap"
+}
+
+data "archive_file" "cancelBooking_lambda" {
+    type = "zip"
+    source_file = "../lambdas/cancelBooking/bootstrap"
+    output_path = "../lambdas/cancelBooking/bootstrap"
+}
+
+data "archive_file" "createSlots_lambda" {
+    type = "zip"
+    source_file = "../lambdas/createSlots/bootstrap"
+    output_path = "../lambdas/createSlots/bootstrap"
+}
+
+data "archive_file" "getBookings_lambda" {
+    type = "zip"
+    source_file = "../lambdas/getBookings/bootstrap"
+    output_path = "../lambdas/getBookings/bootstrap"
+}
+
+resource "aws_lambda_function" "book_lambda" {
+    function_name = "book_lambda"
+    role = aws_iam_role.booking_lambda_role.arn
+    handler = "main"
+    runtime = "provided.al2023"
+    filename = data.archive_file.book_lambda.output_path
+    source_code_hash = data.archive_file.book_lambda.output_base64sha256
+}
+
+resource "aws_lambda_function" "cancelBooking_lambda" {
+    function_name = "cancelBooking_lambda"
+    role = aws_iam_role.booking_lambda_role.arn
+    handler = "main"
+    runtime = "provided.al2023"
+    filename = data.archive_file.cancelBooking_lambda.output_path
+    source_code_hash = data.archive_file.cancelBooking_lambda.output_base64sha256
+}
+
+resource "aws_lambda_function" "createSlots_lambda" {
+    function_name = "createSlots_lambda"
+    role = aws_iam_role.booking_lambda_role.arn
+    handler = "main"
+    runtime = "provided.al2023"
+    filename = data.archive_file.createSlots_lambda.output_path
+    source_code_hash = data.archive_file.createSlots_lambda.output_base64sha256
+}
+
+resource "aws_lambda_function" "getBookings_lambda" {
+    function_name = "getBookings_lambda"
+    role = aws_iam_role.booking_lambda_role.arn
+    handler = "main"
+    runtime = "provided.al2023"
+    filename = data.archive_file.getBookings_lambda.output_path
+    source_code_hash = data.archive_file.getBookings_lambda.output_base64sha256
+}
+
+
 # -----------------------------------------------------------
 # API Gateway Configuration
 # -----------------------------------------------------------
