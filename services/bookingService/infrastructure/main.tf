@@ -6,9 +6,9 @@ resource "aws_db_instance" "booking_db" {
     db_name = "booking_db"
     engine = "mysql"
     engine_version = "5.7"
-    instance_class = "db.t2.micro" # Min in the console is db.t3.micro
-    username = "master"
-    password = "master"
+    instance_class = "db.t3.micro" # Min in the console is db.t3.micro
+    username = "master_username"
+    password = "master_password"
     skip_final_snapshot = true    
     vpc_security_group_ids = [aws_security_group.booking_db_sg.id]
 }
@@ -84,7 +84,7 @@ data "aws_iam_policy_document" "assume_role" {
 }
 
 resource "aws_iam_policy" "lambda_logging_policy" {
-  name        = "lambda_logging_policy"
+  name        = "bookingSerivce_lambda_logging_policy"
   description = "Policy for logging lambda"
   policy = jsonencode({
     Version = "2012-10-17",
@@ -332,10 +332,10 @@ resource "aws_api_gateway_integration" "get_bookings_integration" {
     uri = aws_lambda_function.getBookings_lambda.invoke_arn
 }
 
-resource "aws_api_gateway_stage" "test_stage" {
+resource "aws_api_gateway_stage" "bookingService_test_stage" {
   deployment_id = aws_api_gateway_deployment.booking_api_deployment.id
   rest_api_id   = aws_api_gateway_rest_api.booking_api.id
-  stage_name    = "dev_bookingService"
+  stage_name    = "test_bookingService"
 }
 
 resource "aws_api_gateway_deployment" "booking_api_deployment" {
