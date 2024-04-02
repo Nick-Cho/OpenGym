@@ -37,20 +37,19 @@ resource "aws_security_group" "booking_db_sg" {
 
 resource "aws_cloudwatch_log_group" "book_log_group" {
     name = "/aws/lambda/book"
-    retention_in_days = 2
+    retention_in_days = 1
 }
-
 resource "aws_cloudwatch_log_group" "createSlots_log_group" {
     name = "/aws/lambda/createSlots"
-    retention_in_days = 2
+    retention_in_days = 1
 }
 resource "aws_cloudwatch_log_group" "cancelBooking_log_group" {
     name = "/aws/lambda/cancelBooking"
-    retention_in_days = 2
+    retention_in_days = 1
 }
 resource "aws_cloudwatch_log_group" "getBooking_log_group" {
     name = "/aws/lambda/getBooking"
-    retention_in_days = 2
+    retention_in_days = 1
 }
 
 # -----------------------------------------------------------
@@ -69,6 +68,19 @@ resource "aws_iam_policy" "invoke_policy" {
       }
     ]
   })
+}
+
+data "aws_iam_policy_document" "assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
 }
 
 resource "aws_iam_policy" "lambda_logging_policy" {
@@ -189,7 +201,7 @@ data "archive_file" "getBookings_lambda" {
 
 resource "aws_lambda_function" "book_lambda" {
     function_name = "book_lambda"
-    role = aws_iam_role.booking_lambda_role.arn
+    role = aws_iam_role.book_lambda_role.arn
     handler = "main"
     runtime = "provided.al2023"
     filename = data.archive_file.book_lambda.output_path
@@ -198,7 +210,7 @@ resource "aws_lambda_function" "book_lambda" {
 
 resource "aws_lambda_function" "cancelBooking_lambda" {
     function_name = "cancelBooking_lambda"
-    role = aws_iam_role.booking_lambda_role.arn
+    role = aws_iam_role.cancelBooking_lambda_role.arn
     handler = "main"
     runtime = "provided.al2023"
     filename = data.archive_file.cancelBooking_lambda.output_path
@@ -207,7 +219,7 @@ resource "aws_lambda_function" "cancelBooking_lambda" {
 
 resource "aws_lambda_function" "createSlots_lambda" {
     function_name = "createSlots_lambda"
-    role = aws_iam_role.booking_lambda_role.arn
+    role = aws_iam_role.createSlots_lambda_role.arn
     handler = "main"
     runtime = "provided.al2023"
     filename = data.archive_file.createSlots_lambda.output_path
@@ -216,7 +228,7 @@ resource "aws_lambda_function" "createSlots_lambda" {
 
 resource "aws_lambda_function" "getBookings_lambda" {
     function_name = "getBookings_lambda"
-    role = aws_iam_role.booking_lambda_role.arn
+    role = aws_iam_role.getBookings_lambda_role.arn
     handler = "main"
     runtime = "provided.al2023"
     filename = data.archive_file.getBookings_lambda.output_path
@@ -284,7 +296,7 @@ resource "aws_api_gateway_resource" "create_slots_resource" {
 
 resource "aws_api_gateway_method" "create_slots_method" {
     rest_api_id = aws_api_gateway_rest_api.booking_api.id
-    resource_id = awS_api_gateway_resource.create_slots_resource.id
+    resource_id = aws_api_gateway_resource.create_slots_resource.id
     http_method = "POST"
     authorization = "NONE"
 }
@@ -306,7 +318,7 @@ resource "aws_api_gateway_resource" "get_bookings_resource" {
 
 resource "aws_api_gateway_method" "get_bookings_method" {
     rest_api_id = aws_api_gateway_rest_api.booking_api.id
-    resource_id = awS_api_gateway_resource.get_bookings_resource.id
+    resource_id = aws_api_gateway_resource.get_bookings_resource.id
     http_method = "POST"
     authorization = "NONE"
 }
@@ -327,7 +339,7 @@ resource "aws_api_gateway_stage" "test_stage" {
 }
 
 resource "aws_api_gateway_deployment" "booking_api_deployment" {
-  depends_on = [aws_api_gateway_integration.booking_integration, aws_api_gateway_integration.cancelBooking_integration, aws_api_gateway_integration.createSlots_integration, aws_api_gateway_integration.getBookings_integration]
+  depends_on = [aws_api_gateway_integration.booking_integration, aws_api_gateway_integration.cancel_integration, aws_api_gateway_integration.create_slots_integration, aws_api_gateway_integration.get_bookings_integration]
   rest_api_id = aws_api_gateway_rest_api.booking_api.id
   stage_name  = "dev_bookingService"
 }
