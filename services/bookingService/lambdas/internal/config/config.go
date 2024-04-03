@@ -22,7 +22,7 @@ func Connect() *sql.DB {
 	}
 
 	dbDriver := "mysql"
-	dbUser := "gym_admin"
+	dbUser := "master_username"
 	dbPass := os.Getenv("DB_PASS")
 	dbName := "booking_db"
 	dbIp := os.Getenv("DB_IP")
