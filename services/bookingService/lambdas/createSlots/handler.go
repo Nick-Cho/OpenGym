@@ -38,8 +38,11 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 
 	available_slots := max_slots // Not necessary, just to make code more readable
 
+	log.Printf("Flag 1")
+
 	sqlRequest := fmt.Sprintf("INSERT INTO TimeSlots (GymId, StartTime, EndTime, Date, MaxSlots, AvailableSlots, Version) VALUES (%d, %s, %s, %s, %d, %d, 0)", gym_id, start_time, end_time, date, max_slots, available_slots)
 	stmt, err := db.Prepare(sqlRequest)
+	log.Printf("Flag 2")
 	if err != nil {
 		log.Printf("Error %s when preparing sql statement \n", err)
 		response := response.CreateMsgResp(400, fmt.Sprintf("Error preparing sql statement: %s", err))
@@ -47,6 +50,7 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 	}
 	defer stmt.Close()
 	res, err := stmt.Exec()
+	log.Printf("Flag 3")
 	if err != nil {
 		log.Printf("Error %s when executing sql statement \n", err)
 		response := response.CreateMsgResp(400, fmt.Sprintf("Error executing sql statement: %s", err))

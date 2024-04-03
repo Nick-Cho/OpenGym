@@ -1,12 +1,12 @@
 define build_binaries
 	@echo "Building binaries..."
-	@GOOS=linux GOARCH=arm64 go build -o get_bookings/bootstrap get_bookings/main.go get_bookings/handler.go
+	@GOOS=linux GOARCH=arm64 go build -o createSlots/bootstrap createSlots/main.go createSlots/handler.go
 	@echo "Finished building binaries..."
 endef
 
 define zip_files
 	@echo "Zipping files..."
-	zip -j get_bookings/bootstrap.zip get_bookings/bootstrap
+	zip -j createSlots/bootstrap.zip createSlots/bootstrap
 	@echo "Finished zipping files..."
 endef
 
