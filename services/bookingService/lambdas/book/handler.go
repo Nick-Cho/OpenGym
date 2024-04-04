@@ -47,7 +47,7 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 	f_slot_id := slot_id.(float64)
 	slot_id = int(f_slot_id)
 	// Optimistic Concurrency
-	sqlReq := fmt.Sprintf("SELECT * FROM TimeSlots WHERE SlotId='%d", slot_id)
+	sqlReq := fmt.Sprintf("SELECT * FROM TimeSlots WHERE SlotId=%d", slot_id)
 	res, err := db.Query(sqlReq)
 
 	if err != nil {
@@ -76,7 +76,7 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 	timeSlots.Version++
 
 	// Check for TimeSlots Optimistic Concurrency
-	sqlReq = fmt.Sprintf("SELECT Version FROM TimeSlots WHERE SlotId='%d", slot_id)
+	sqlReq = fmt.Sprintf("SELECT Version FROM TimeSlots WHERE SlotId=%d", slot_id)
 	res, err = db.Query(sqlReq)
 
 	if err != nil {
@@ -96,7 +96,7 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 		log.Println("Version mismatch")
 		return response.CreateMsgResp(400, "Version mismatch"), nil
 	} else {
-		sqlReq = fmt.Sprintf("UPDATE TimeSlots SET AvailableSlots = '%d', Version = '%d' WHERE SlotId = '%d'", timeSlots.AvailableSlots, timeSlots.Version, timeSlots.SlotId)
+		sqlReq = fmt.Sprintf("UPDATE TimeSlots SET AvailableSlots = %d, Version = %d WHERE SlotId = %d", timeSlots.AvailableSlots, timeSlots.Version, timeSlots.SlotId)
 		stmt, err := db.Prepare(sqlReq)
 
 		if err != nil {
