@@ -37,7 +37,7 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 	db := config.Connect()
 	json.Unmarshal([]byte(request.Body), &requestBody)
 
-	date := requestBody["date"]
+	booking_date := requestBody["booking_date"]
 	gym_id := requestBody["gym_id"]
 	start_time := requestBody["start_time"]
 	end_time := requestBody["end_time"]
@@ -45,7 +45,7 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 	f_gym_id := gym_id.(float64)
 	gym_id = int(f_gym_id)
 
-	sqlReq := fmt.Sprintf("SELECT * FROM TimeSlots WHERE GymId='%d' AND Date='%s' AND StartTime='%s' AND EndTime='%s'", gym_id, date, start_time, end_time)
+	sqlReq := fmt.Sprintf("SELECT * FROM TimeSlots WHERE GymId='%d' AND BookingDate='%s' AND StartTime='%s' AND EndTime='%s'", gym_id, booking_date, start_time, end_time)
 	res, err := db.Query(sqlReq)
 
 	if err != nil {
