@@ -40,7 +40,7 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 
 	log.Printf("Flag 1")
 
-	sqlRequest := fmt.Sprintf("INSERT INTO TimeSlots (GymId, StartTime, EndTime, Date, MaxSlots, AvailableSlots, Version) VALUES (%d, %s, %s, %s, %d, %d, 0)", gym_id, start_time, end_time, date, max_slots, available_slots)
+	sqlRequest := fmt.Sprintf("INSERT INTO TimeSlots (GymId, StartTime, EndTime, BookingDate, MaxSlots, AvailableSlots, Version) VALUES (%d, '%s', '%s', '%s', %d, %d, 0)", gym_id, start_time, end_time, date, max_slots, available_slots)
 	stmt, err := db.Prepare(sqlRequest)
 	log.Printf("Flag 2")
 	if err != nil {
