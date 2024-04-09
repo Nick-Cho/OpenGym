@@ -1,0 +1,1 @@
+{"c":["pages/user/profile","pages/index","pages/post/[_id]","webpack"],"r":["pages/post/[_id]"],"m":["./node_modules/next/dist/build/webpack/loaders/next-client-pages-loader.js?page=%2Fpost%2F%5B_id%5D&absolutePagePath=C%3A%5CUsers%5CNick%5CDesktop%5CCoding%5Csocial-network-app%5Cclient%5Cpages%5Cpost%5C%5B_id%5D.js!","./pages/post/[_id].js"]}

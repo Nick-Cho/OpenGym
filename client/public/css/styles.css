@@ -1,0 +1,7 @@
+.active{
+  background-color: navy;
+}
+
+.quill > .ql-container > .ql-editor.ql-blank::before{
+  color:rgba(255, 255, 255, 0.76);
+}

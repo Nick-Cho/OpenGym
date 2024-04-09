@@ -99,7 +99,7 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 		sqlReq = fmt.Sprintf("UPDATE TimeSlots SET AvailableSlots = %d, Version = %d WHERE SlotId = %d", timeSlots.AvailableSlots, timeSlots.Version, timeSlots.SlotId)
 		stmt, err := db.Prepare(sqlReq)
 
-		if err != nil {
+		if err != nil {[]=
 			log.Printf("Error %s when preparing sql statement \n", err)
 			response := response.CreateMsgResp(400, fmt.Sprintf("Error preparing sql statement: %s", err))
 			return response, nil

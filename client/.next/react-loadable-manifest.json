@@ -1,0 +1,8 @@
+{
+  "..\\components\\forms\\PostForm.js -> react-quill": {
+    "id": "./node_modules/react-quill/lib/index.js",
+    "files": [
+      "static/chunks/node_modules_react-quill_lib_index_js.js"
+    ]
+  }
+}
