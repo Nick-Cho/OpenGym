@@ -1,7 +1,7 @@
 # OpenGym
 
-OpenGym is an application that seeks to provide a platform for homegym owners to make their homegym available for commercial use in both a normal commercial gym format and a booking format similar to that of a hotel.
-
+OpenGym is an application that seeks to provide a platform for homegym owners to make their homegym available for commercial use in both a normal commercial gym format and a booking format similar to that of a hotel. <br />
+- App not hosted due to high cost of AWS services
 ## How It was Built
 ### Technologies
 - Frontend: React, Next.JS, Bootstrap
@@ -52,6 +52,13 @@ The smaller the division, the more accurate your search will be. For my search I
 This service provides the user a tool to book a time slot to use a homegym (owners have the option to allow users to come in at any time, representing by the **Is_Commercial** field in the Gym Table. The main focusses for this service are:
 - High Consistency (avoid overbooking)
 - Security (for payments in the future) <br />
+Consistency is important to avoid the problem of an overbooked time slots if both users happen to book at the same time. At first, I was considering the use of isolation DB levels however, my use case would require a serializable level which would bottleneck the DB transactions severely. Instead I opted for **optimistic concurrency** as these write consistency issues wouldn't be frequent enough to require **pessimistic concurrency** and using pessimistic concurrency would also prove slower than optimistic concurrency.
+
+## Todo
+- Finish MSK broker configuration
+- Payment system for in app transactions
+- Webjob to automate timeslot writing
+
   
 
 
